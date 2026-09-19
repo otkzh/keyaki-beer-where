@@ -14,10 +14,10 @@
 
 ## 実行
 
-ビルドや外部ライブラリは不要です。`dist/` が公開用ディレクトリです。
+ビルドや外部ライブラリは不要です。リポジトリのルートが公開用ディレクトリです。
 
 ```sh
-python3 -m http.server 8000 --directory dist
+python3 -m http.server 8000
 ```
 
 ブラウザで http://localhost:8000 を開きます。位置情報の取得にはHTTPSまたはlocalhostと、利用者による許可が必要です。
@@ -30,7 +30,7 @@ GPSから会場図への変換は暫定的な座標範囲を用いた概算で�
 
 - けやきひろばビール祭り公式サイト: https://www.beerkeyaki.jp/map/
 - 元PDF: https://www.beerkeyaki.jp/files/uploads/2026autumn.pdf
-- SVG: `dist/assets/2026autumn-vector.svg`
+- SVG: `2026autumn-vector.svg`
 
 会場図の権利は元の権利者に帰属します。本アプリは非公式であり、主催者による提供・承認を示すものではありません。会場図をアプリ独自の著作物や自由利用可能な素材として扱うものではありません。
 
