@@ -1,0 +1,150 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
+  <meta name="theme-color" content="#ff5a82">
+  <title>けやきビール祭り｜いまここ</title>
+  <meta name="description" content="2026けやきひろば秋のビール祭りの会場図に、待ち合わせ位置を表示するスマホ用アプリです。">
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect rx='14' width='64' height='64' fill='%23ff5a82'/%3E%3Cpath d='M23 13h20v34a8 8 0 0 1-8 8h-4a8 8 0 0 1-8-8z' fill='%23ffd84d'/%3E%3Cpath d='M43 21h5a8 8 0 0 1 0 16h-5' fill='none' stroke='white' stroke-width='5'/%3E%3Cpath d='M20 10h26' stroke='white' stroke-width='5' stroke-linecap='round'/%3E%3C/svg%3E">
+  <meta property="og:title" content="けやきビール祭り｜いまここ">
+  <meta property="og:description" content="会場図に待ち合わせ位置を表示してスクショできます。">
+  <style>
+    :root{--pink:#f0527b;--ink:#20201d;--cream:#fffdf3;--green:#13924b;--line:#e9e3d7}
+    *{box-sizing:border-box} html,body{margin:0;min-height:100%;background:#f7f3e8;color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Noto Sans JP","Yu Gothic",sans-serif}
+    body{padding:max(10px,env(safe-area-inset-top)) 10px max(18px,env(safe-area-inset-bottom));background-image:radial-gradient(#e7dfca 1px,transparent 1px);background-size:16px 16px}
+    .app{width:min(100%,520px);margin:auto}.head{display:flex;align-items:flex-end;justify-content:space-between;gap:10px;margin:3px 3px 10px}
+    h1{font-size:clamp(22px,6vw,30px);line-height:1;margin:0;letter-spacing:-.04em}.sub{font-size:12px;font-weight:800;color:var(--pink);margin-top:5px}.status{font-size:11px;text-align:right;color:#625f58;line-height:1.35}
+    .map-card{position:relative;background:white;border:2px solid var(--ink);border-radius:20px;overflow:hidden;box-shadow:5px 6px 0 var(--ink);touch-action:none}
+    .map-layer{position:relative;transform-origin:50% 50%}.map-card img{display:block;width:100%;height:auto;user-select:none;-webkit-user-drag:none}
+    .pin{position:absolute;left:50%;top:48%;transform:translate(-50%,-100%);filter:drop-shadow(0 3px 1px #0005);pointer-events:none;z-index:3;transition:left .25s ease,top .25s ease}
+    .pin-dot{width:42px;height:42px;border-radius:50% 50% 50% 0;background:var(--pink);border:4px solid white;transform:rotate(-45deg);display:grid;place-items:center}
+    .pin-dot:after{content:"";width:11px;height:11px;border-radius:50%;background:white}
+    .bubble{position:absolute;left:50%;top:48%;transform:translate(-50%,10px);z-index:4;pointer-events:none;background:var(--ink);color:white;border-radius:10px;padding:6px 10px;font-size:13px;font-weight:900;white-space:nowrap;box-shadow:0 2px 0 #fff;transition:left .25s ease,top .25s ease}
+    .accuracy{position:absolute;display:none;border:2px solid #2689e5aa;background:#4ea8ff2e;border-radius:50%;transform:translate(-50%,-50%);pointer-events:none;z-index:2}
+    .hint{position:absolute;left:10px;top:10px;background:#fffde8e8;border:1px solid #cfbf91;border-radius:999px;padding:6px 10px;font-size:11px;font-weight:800;z-index:5;backdrop-filter:blur(5px)}
+    .zoom-tools{position:absolute;right:9px;top:9px;z-index:7;display:grid;gap:5px}.zoom-tools button{width:39px;height:39px;border:2px solid var(--ink);border-radius:11px;background:#fffffff0;color:var(--ink);font:900 24px/1 inherit;box-shadow:2px 2px 0 var(--ink);padding:0}.zoom-tools button:active{transform:translate(1px,1px);box-shadow:1px 1px 0 var(--ink)}.zoom-level{background:#20201de8;color:white;border-radius:8px;padding:4px 2px;text-align:center;font-size:10px;font-weight:900}
+    .controls{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:14px}.controls button{min-height:51px;border:2px solid var(--ink);border-radius:14px;background:white;color:var(--ink);font:800 15px/1.15 inherit;box-shadow:3px 3px 0 var(--ink);padding:9px}.controls button:active{transform:translate(2px,2px);box-shadow:1px 1px 0 var(--ink)}
+    #locate{background:var(--green);color:white}.wide{grid-column:1/-1;background:var(--pink)!important;color:white!important}
+    .field{display:flex;gap:7px;margin:11px 2px 0}.field input{width:100%;min-height:44px;border:2px solid var(--ink);border-radius:12px;padding:0 12px;font:700 15px inherit;background:white}.field button{border:0;border-radius:12px;background:var(--ink);color:white;padding:0 14px;font-weight:800}
+    .note{margin:12px 3px 0;font-size:11px;line-height:1.55;color:#68645c}.note a{color:inherit}.toast{position:fixed;left:50%;bottom:25px;transform:translate(-50%,20px);background:#20201deb;color:white;padding:10px 14px;border-radius:99px;font-size:13px;font-weight:800;opacity:0;transition:.2s;z-index:20;white-space:nowrap}.toast.on{opacity:1;transform:translate(-50%,0)}
+    body.shot{padding:0;background:white}.shot .app{width:100%;max-width:none}.shot .head{padding:13px 14px 9px;margin:0}.shot .map-card{border-radius:0;border-width:2px 0;box-shadow:none}.shot .controls,.shot .field,.shot .note,.shot .hint,.shot .zoom-tools{display:none}.shot h1{font-size:23px}.shot .status{font-size:10px}.shot .exit{display:block}
+    .exit{display:none;position:fixed;right:9px;bottom:9px;border:0;border-radius:999px;background:#0009;color:white;padding:8px 11px;font-weight:800;z-index:10}
+    @media (max-height:760px){.head{margin-bottom:7px}.controls button{min-height:46px}.note{margin-top:9px}.map-card{max-height:64vh}.map-card img{height:100%;object-fit:contain}}
+    .pin{width:0;height:0;transform:scale(var(--inverse-zoom,1));transform-origin:0 0;filter:none}
+    .pin svg{position:absolute;bottom:0;left:0;width:var(--marker-size,42px);height:auto;transform:translateX(-50%);overflow:visible;filter:drop-shadow(0 2px 1px #0005)}
+    .pin .cross-symbol{display:none;transform:translate(-50%,50%)}
+    .pin.is-cross .pin-symbol{display:none}.pin.is-cross .cross-symbol{display:block}
+    .bubble{transform:translate(-50%,calc(var(--label-gap,10px) * var(--inverse-zoom,1))) scale(var(--inverse-zoom,1));transform-origin:50% 0}
+    .marker-settings{margin:12px 2px 0;padding:10px 12px;border:2px solid var(--ink);border-radius:12px;background:white;min-width:0;font-size:14px}
+    .marker-settings legend{font-weight:800;padding:0 5px}.marker-shapes{display:flex;gap:24px}.marker-shapes label{display:flex;align-items:center;min-height:36px;gap:5px}
+    .marker-settings input{accent-color:var(--pink)}.marker-size{display:flex;align-items:center;gap:8px;margin-top:4px}.marker-size input{flex:1;min-width:50px;height:36px}.marker-size output{min-width:42px;text-align:right;font-variant-numeric:tabular-nums}
+    .marker-settings p{font-size:12px;margin:5px 0 0;color:#68645c}.shot .marker-settings{display:none}
+  </style>
+</head>
+<body>
+<main class="app">
+  <header class="head">
+    <div><h1>🍺 いまここ</h1><div class="sub">2026 けやきひろば秋のビール祭り</div></div>
+    <div class="status"><b id="clock">--:--</b><br><span id="status">位置を選んでください</span></div>
+  </header>
+  <section class="map-card" id="map" aria-label="会場図。タップすると現在地マーカーを移動できます">
+    <div class="map-layer" id="mapLayer">
+      <img src="2026autumn-vector.svg" alt="2026けやきひろば秋のビール祭り会場図（添付PDFから変換したベクター版）">
+      <div class="accuracy" id="accuracy"></div>
+      <div class="pin" id="pin">
+        <svg class="pin-symbol" viewBox="0 0 48 60" aria-hidden="true"><path d="M24 58C20 50 3 34 3 23a21 21 0 0 1 42 0c0 11-17 27-21 35Z" fill="var(--pink)" stroke="white" stroke-width="3"/><circle cx="24" cy="23" r="7" fill="white"/></svg>
+        <svg class="cross-symbol" viewBox="0 0 48 48" aria-hidden="true"><path d="M24 4V44M4 24H44" fill="none" stroke="white" stroke-width="9"/><path d="M24 4V44M4 24H44" fill="none" stroke="var(--pink)" stroke-width="5"/></svg>
+      </div>
+      <div class="bubble" id="bubble">ここにいます</div>
+    </div>
+    <div class="hint">ピンチで拡大・1本指で移動</div>
+    <div class="zoom-tools" aria-label="地図の拡大縮小"><button id="zoomIn" aria-label="拡大">＋</button><button id="zoomOut" aria-label="縮小">−</button><div class="zoom-level" id="zoomLevel">100%</div></div>
+  </section>
+  <div class="field"><input id="label" maxlength="24" value="ここにいます" aria-label="マーカーのメッセージ"><button id="apply">反映</button></div>
+  <fieldset class="marker-settings">
+    <legend>マーカー</legend>
+    <div class="marker-shapes"><label><input type="radio" name="markerShape" value="pin" checked> ピン</label><label><input type="radio" name="markerShape" value="cross"> 十字 ＋</label></div>
+    <label class="marker-size" for="markerSize">大きさ <input type="range" id="markerSize" min="20" max="72" step="2" value="42"><output id="markerSizeValue" for="markerSize">42px</output></label>
+    <p>地図を拡大してもマーカーの大きさは一定です。</p>
+  </fieldset>
+  <div class="controls">
+    <button id="locate">◎ 現在地を取得</button><button id="center">↺ 中央に戻す</button>
+    <button class="wide" id="shot">▣ スクショ用に表示</button>
+  </div>
+  <p class="note">屋外でもGPSには誤差があります。取得後、実際にいる場所へピンを動かしてください。スクショ用表示にして、スマホの電源＋音量下ボタンなどで撮影できます。会場図：<a href="https://www.beerkeyaki.jp/map/" target="_blank" rel="noopener">けやきひろばビール祭り公式サイト</a></p>
+</main>
+<button class="exit" id="exit">編集に戻る</button><div class="toast" id="toast"></div>
+<script>
+(()=>{
+  const map=document.querySelector('#map'),layer=document.querySelector('#mapLayer'),pin=document.querySelector('#pin'),bubble=document.querySelector('#bubble'),acc=document.querySelector('#accuracy');
+  const status=document.querySelector('#status'),label=document.querySelector('#label'),toast=document.querySelector('#toast');
+  let pos=JSON.parse(localStorage.getItem('keyaki-pin')||'null')||{x:.5,y:.48};
+  // Approximate outdoor bounds of the illustrated venue. Manual correction is intentionally primary.
+  const bounds={north:35.89502,south:35.89322,west:139.62947,east:139.63120};
+  function setPos(x,y,save=true){pos={x:Math.max(.025,Math.min(.975,x)),y:Math.max(.12,Math.min(.94,y))};pin.style.left=bubble.style.left=(pos.x*100)+'%';pin.style.top=bubble.style.top=(pos.y*100)+'%';if(save)localStorage.setItem('keyaki-pin',JSON.stringify(pos));}
+  function say(t){toast.textContent=t;toast.classList.add('on');clearTimeout(say.t);say.t=setTimeout(()=>toast.classList.remove('on'),1800)}
+  function clock(){const d=new Date;document.querySelector('#clock').textContent=d.toLocaleTimeString('ja-JP',{hour:'2-digit',minute:'2-digit'})} clock();setInterval(clock,30000);setPos(pos.x,pos.y,false);
+  let view={scale:1,tx:0,ty:0},pointers=new Map(),gesture=null;
+  const sizeInput=document.querySelector('#markerSize'),sizeOutput=document.querySelector('#markerSizeValue');
+  let markerSize=42,markerShape='pin';
+  try{const savedSize=Number(localStorage.getItem('keyaki-marker-size'));if(savedSize>=20&&savedSize<=72)markerSize=savedSize;markerShape=localStorage.getItem('keyaki-marker-shape')==='cross'?'cross':'pin'}catch{}
+  function applyMarker(){
+    layer.style.setProperty('--marker-size',markerSize+'px');
+    layer.style.setProperty('--label-gap',(markerShape==='cross'?markerSize/2+8:10)+'px');
+    pin.classList.toggle('is-cross',markerShape==='cross');
+    sizeInput.value=markerSize;sizeOutput.textContent=markerSize+'px';
+    document.querySelectorAll('[name="markerShape"]').forEach(r=>r.checked=r.value===markerShape);
+  }
+  sizeInput.addEventListener('input',()=>{markerSize=Number(sizeInput.value);applyMarker();try{localStorage.setItem('keyaki-marker-size',markerSize)}catch{}});
+  document.querySelectorAll('[name="markerShape"]').forEach(r=>r.addEventListener('change',()=>{markerShape=r.value;applyMarker();try{localStorage.setItem('keyaki-marker-shape',markerShape)}catch{}}));
+  applyMarker();
+  function applyView(){
+    const maxX=map.clientWidth*(view.scale-1)/2,maxY=map.clientHeight*(view.scale-1)/2;
+    view.tx=Math.max(-maxX,Math.min(maxX,view.tx));view.ty=Math.max(-maxY,Math.min(maxY,view.ty));
+    layer.style.transform=`translate(${view.tx}px,${view.ty}px) scale(${view.scale})`;
+    layer.style.setProperty('--inverse-zoom',1/view.scale);
+    document.querySelector('#zoomLevel').textContent=Math.round(view.scale*100)+'%';
+  }
+  function zoomTo(next){view.scale=Math.max(1,Math.min(4,next));if(view.scale===1)view.tx=view.ty=0;applyView()}
+  document.querySelector('#zoomIn').onclick=e=>{e.stopPropagation();zoomTo(view.scale+.5)};
+  document.querySelector('#zoomOut').onclick=e=>{e.stopPropagation();zoomTo(view.scale-.5)};
+  map.addEventListener('wheel',e=>{if(document.body.classList.contains('shot'))return;e.preventDefault();zoomTo(view.scale+(e.deltaY<0 ? .25 : -.25))},{passive:false});
+  map.addEventListener('pointerdown',e=>{
+    if(document.body.classList.contains('shot')||e.target.closest('.zoom-tools'))return;e.preventDefault();map.setPointerCapture(e.pointerId);pointers.set(e.pointerId,{x:e.clientX,y:e.clientY,sx:e.clientX,sy:e.clientY});
+    if(pointers.size===1)gesture={tx:view.tx,ty:view.ty,moved:false};
+    if(pointers.size===2){const a=[...pointers.values()];gesture={distance:Math.hypot(a[0].x-a[1].x,a[0].y-a[1].y),scale:view.scale,tx:view.tx,ty:view.ty,moved:true}}
+  });
+  map.addEventListener('pointermove',e=>{
+    const p=pointers.get(e.pointerId);if(!p)return;p.x=e.clientX;p.y=e.clientY;
+    if(pointers.size===2){const a=[...pointers.values()];view.scale=Math.max(1,Math.min(4,gesture.scale*Math.hypot(a[0].x-a[1].x,a[0].y-a[1].y)/gesture.distance));applyView();return}
+    if(pointers.size===1&&view.scale>1){const dx=p.x-p.sx,dy=p.y-p.sy;if(Math.hypot(dx,dy)>5)gesture.moved=true;view.tx=gesture.tx+dx;view.ty=gesture.ty+dy;applyView()}
+  });
+  function endPointer(e){
+    const p=pointers.get(e.pointerId);if(!p)return;const wasTap=pointers.size===1&&!gesture?.moved&&Math.hypot(p.x-p.sx,p.y-p.sy)<8;pointers.delete(e.pointerId);
+    if(wasTap){const r=layer.getBoundingClientRect();setPos((e.clientX-r.left)/r.width,(e.clientY-r.top)/r.height);acc.style.display='none';status.textContent='手動で位置を指定';navigator.vibrate?.(25)}
+    if(pointers.size===1){const left=[...pointers.values()][0];left.sx=left.x;left.sy=left.y;gesture={tx:view.tx,ty:view.ty,moved:true}}
+  }
+  map.addEventListener('pointerup',endPointer);map.addEventListener('pointercancel',endPointer);
+  document.querySelector('#apply').onclick=()=>{bubble.textContent=label.value.trim()||'ここにいます';localStorage.setItem('keyaki-label',bubble.textContent);say('メッセージを反映しました')};
+  const saved=localStorage.getItem('keyaki-label');if(saved){label.value=bubble.textContent=saved}
+  document.querySelector('#center').onclick=()=>{setPos(.5,.48);acc.style.display='none';view={scale:1,tx:0,ty:0};applyView();status.textContent='中央に戻しました'};
+  document.querySelector('#locate').onclick=()=>{
+    if(!navigator.geolocation){say('この端末では位置情報を使えません');return}
+    status.textContent='位置情報を取得中…';
+    navigator.geolocation.getCurrentPosition(p=>{
+      const {latitude:lat,longitude:lon,accuracy}=p.coords;
+      const x=(lon-bounds.west)/(bounds.east-bounds.west),y=(bounds.north-lat)/(bounds.north-bounds.south);
+      setPos(x,y);
+      const meters=Math.max(accuracy,8),w=Math.min(layer.clientWidth*.6,meters/155*layer.clientWidth);
+      acc.style.cssText=`display:block;left:${pos.x*100}%;top:${pos.y*100}%;width:${w}px;height:${w}px`;
+      status.textContent=`GPS誤差 約${Math.round(accuracy)}m`;
+      if(x<0||x>1||y<.1||y>1)say('会場外を指しています。手動で補正してください');else say('現在地を表示しました');
+    },err=>{status.textContent='位置情報を取得できません';say(err.code===1?'位置情報の利用を許可してください':'GPSを受信できません')},{enableHighAccuracy:true,timeout:12000,maximumAge:5000});
+  };
+  document.querySelector('#shot').onclick=()=>{document.body.classList.add('shot');window.scrollTo(0,0);say('スマホのスクリーンショット操作で撮影')};
+  document.querySelector('#exit').onclick=()=>document.body.classList.remove('shot');applyView();
+})();
+</script>
+</body>
+</html>
