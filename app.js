@@ -10,7 +10,7 @@
   let markerShape='drop';
   function applyMarker(){
     layer.style.setProperty('--marker-size',markerSize+'px');
-    layer.style.setProperty('--label-gap','10px');
+    layer.style.setProperty('--label-gap',(markerShape==='cross'?markerSize/2+8:10)+'px');
     pin.className='pin is-'+markerShape;
     pin.querySelectorAll('svg').forEach(icon=>icon.toggleAttribute('hidden',!icon.classList.contains(markerShape+'-symbol')));
     pin.setAttribute('aria-label',markerShape==='drop'?'ドロップのマーカー。タップで十字に切り替え':'十字のマーカー。タップでドロップに切り替え');
@@ -143,11 +143,11 @@
   let shotObjectUrl=null,shotFile=null;
   function drawMarker(ctx,x,y,size){
     ctx.save();ctx.shadowColor='#0005';ctx.shadowBlur=size*.07;ctx.shadowOffsetY=size*.05;
-    ctx.translate(x-size/2,y-size*60/48);ctx.scale(size/48,size/48);
     if(markerShape==='cross'){
-      const shape=new Path2D('M19 5h10v16h14v10H29v24H19V31H5V21h14Z');
-      ctx.fillStyle='#356c4e';ctx.strokeStyle='white';ctx.lineWidth=3;ctx.fill(shape);ctx.stroke(shape);
+      ctx.lineCap='round';ctx.beginPath();ctx.moveTo(x,y-size*.42);ctx.lineTo(x,y+size*.42);ctx.moveTo(x-size*.42,y);ctx.lineTo(x+size*.42,y);
+      ctx.strokeStyle='white';ctx.lineWidth=size*.19;ctx.stroke();ctx.strokeStyle='#f0527b';ctx.lineWidth=size*.105;ctx.stroke();
     }else{
+      ctx.translate(x-size/2,y-size*60/48);ctx.scale(size/48,size/48);
       const shape=new Path2D('M24 58C20 50 3 34 3 23a21 21 0 0 1 42 0c0 11-17 27-21 35Z');
       ctx.fillStyle='#c65b47';ctx.strokeStyle='white';ctx.lineWidth=3;ctx.fill(shape);ctx.stroke(shape);
       ctx.shadowColor='transparent';ctx.beginPath();ctx.arc(24,23,7,0,Math.PI*2);ctx.fillStyle='white';ctx.fill();

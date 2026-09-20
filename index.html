@@ -9,7 +9,7 @@
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' fill='%23c65b47'/%3E%3Cpath d='M23 13h20v34a8 8 0 0 1-8 8h-4a8 8 0 0 1-8-8z' fill='%23ffd84d'/%3E%3Cpath d='M43 21h5a8 8 0 0 1 0 16h-5' fill='none' stroke='white' stroke-width='5'/%3E%3Cpath d='M20 10h26' stroke='white' stroke-width='5' stroke-linecap='round'/%3E%3C/svg%3E">
   <meta property="og:title" content="けやきビール祭り｜いまここ">
   <meta property="og:description" content="会場図に待ち合わせ位置を表示し、画像を作れます。">
-  <link rel="stylesheet" href="style.css?v=10">
+  <link rel="stylesheet" href="style.css?v=11">
 </head>
 <body>
 <main class="app">
@@ -17,7 +17,7 @@
     <div class="brand"><h1>🍺 いまここ</h1><div class="sub">待ち合わせマップ</div></div>
     <time id="clock">--:--</time>
     <div class="header-actions" aria-label="操作">
-      <button id="priceMode" class="mode-button" aria-label="ビールの銘柄と価格を見る" aria-pressed="false" title="ビールの銘柄と価格を見る"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h13l-1 13H5L4 7Z" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M17 9h3a2 2 0 0 1 0 4h-3M3 6c0-2 3-3 4-1 2-2 4-1 5 0 2-1 5 0 5 2H4" fill="none" stroke="currentColor" stroke-width="1.8"/></svg><span>銘柄</span></button>
+      <button id="priceMode" class="mode-button" aria-label="ビールの銘柄と価格を見る" aria-pressed="false" title="ビールの銘柄と価格を見る"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h13l-1 13H5L4 7Z" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M17 9h3a2 2 0 0 1 0 4h-3M3 6c0-2 3-3 4-1 2-2 4-1 5 0 2-1 5 0 5 2H4" fill="none" stroke="currentColor" stroke-width="1.8"/></svg></button>
       <button id="reset" aria-label="地図とマーカーをリセット" title="地図とマーカーをリセット">↺</button>
       <button id="shot" aria-label="共有用の画像を作る" title="共有用の画像を作る"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 15V3m0 0L8 7m4-4 4 4M5 13v7h14v-7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square" stroke-linejoin="miter"/></svg></button>
     </div>
@@ -28,7 +28,7 @@
       <img src="2026autumn-vector.svg" alt="2026けやきひろば秋のビール祭り会場図（添付PDFから変換したベクター版）">
       <button class="pin is-drop" id="pin" type="button" aria-label="ドロップのマーカー。タップで十字に切り替え" title="タップでマーカーを切り替え">
         <svg class="drop-symbol" viewBox="0 0 48 60" aria-hidden="true"><path d="M24 58C20 50 3 34 3 23a21 21 0 0 1 42 0c0 11-17 27-21 35Z" fill="var(--accent)" stroke="white" stroke-width="3"/><circle cx="24" cy="23" r="7" fill="white"/></svg>
-        <svg class="cross-symbol" viewBox="0 0 48 60" aria-hidden="true" hidden><path d="M19 5h10v16h14v10H29v24H19V31H5V21h14Z" fill="#356c4e" stroke="white" stroke-width="3"/></svg>
+        <svg class="cross-symbol" viewBox="0 0 48 48" aria-hidden="true" hidden><path d="M24 4V44M4 24H44" fill="none" stroke="white" stroke-width="9"/><path d="M24 4V44M4 24H44" fill="none" stroke="#f0527b" stroke-width="5"/></svg>
       </button>
       <div class="bubble" id="bubble">ここにいます</div>
       <div class="shop-focus" id="shopFocus" hidden></div>
@@ -57,6 +57,6 @@
   </div>
 </dialog>
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
-<script src="app.js?v=10" defer></script>
+<script src="app.js?v=11" defer></script>
 </body>
 </html>

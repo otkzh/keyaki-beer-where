@@ -84,8 +84,8 @@ h1 {
 .header-actions button:active { background: #d6dbd2; }
 .header-actions button:disabled { opacity: .55; cursor: wait; }
 .header-actions button svg { display: block; width: 20px; height: 20px; }
-.header-actions .mode-button { display: flex; align-items: center; justify-content: center; gap: 3px; width: 69px; font-size: 12px; }
-.header-actions .mode-button svg { width: 19px; height: 19px; }
+.header-actions .mode-button { width: 36px; }
+.header-actions .mode-button svg { width: 20px; height: 20px; }
 .header-actions .mode-button[aria-pressed="true"] { background: var(--ink); color: white; }
 
 .region-selector { display: flex; align-items: center; gap: 8px; margin: 0 0 9px; font-size: 12px; font-weight: 700; }
@@ -155,6 +155,7 @@ h1 {
 
 .pin svg[hidden] { display: none !important; }
 .pin.is-drop .drop-symbol, .pin.is-cross .cross-symbol { display: block; }
+.pin.is-cross { height: var(--marker-size, 42px); transform: translate(-50%, -50%) scale(var(--inverse-zoom, 1)); transform-origin: 50% 50%; }
 .pin:focus-visible { outline: 2px solid var(--ink); outline-offset: 3px; }
 .app.price-mode .pin, .app.price-mode .bubble { visibility: hidden; }
 
@@ -382,5 +383,5 @@ h1 {
   #clock { font-size: 18px; }
   .header-actions { gap: 3px; }
   .header-actions button { width: 30px; height: 30px; font-size: 17px; }
-  .header-actions .mode-button { width: 65px; font-size: 11px; }
+  .header-actions .mode-button { width: 30px; }
 }
