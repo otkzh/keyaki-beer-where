@@ -23,12 +23,24 @@
     status.textContent=markerShape==='drop'?'ドロップに切り替えました':'十字に切り替えました';
   });
   applyMarker();
-  const priceModeButton=document.querySelector('#priceMode'),shopSelector=document.querySelector('#shopSelector'),shopSelect=document.querySelector('#shopSelect');
+  const priceModeButton=document.querySelector('#priceMode'),regionSelector=document.querySelector('#regionSelector'),regionSelect=document.querySelector('#regionSelect');
   const shopPanel=document.querySelector('#shopPanel'),shopPanelBody=document.querySelector('#shopPanelBody'),shopFocus=document.querySelector('#shopFocus'),shopHotspots=document.querySelector('#shopHotspots');
-  let shopMode=false,shops=[];
+  let shopMode=false,shops=[],activeRegion='',selectedShop=null;
   const catalogPromise=fetch('data/beers.json?v=1').then(response=>{if(!response.ok)throw new Error('店舗データを読み込めません');return response.json()}).then(data=>data.shops);
   function element(tag,className,text){const node=document.createElement(tag);if(className)node.className=className;if(text!==undefined)node.textContent=text;return node}
-  function closeShop(){shopPanel.hidden=true;shopFocus.hidden=true;shopSelect.value=''}
+  function filteredShops(){return activeRegion?shops.filter(shop=>shop.region===activeRegion):shops}
+  function regionStatus(){return activeRegion?`${activeRegion}の${filteredShops().length}店舗を強調表示。番号をタップ`:'店舗番号をタップして銘柄と価格を表示'}
+  function closeShop(){shopPanel.hidden=true;shopFocus.hidden=true;selectedShop=null}
+  function applyRegion(){
+    activeRegion=regionSelect.value;
+    for(const button of shopHotspots.children){
+      const match=!activeRegion||button.dataset.region===activeRegion;
+      button.hidden=!match;
+      button.classList.toggle('is-match',!!activeRegion&&match);
+    }
+    if(selectedShop&&activeRegion&&selectedShop.region!==activeRegion)closeShop();
+    status.textContent=regionStatus();
+  }
   function showShop(shop){
     document.querySelector('#shopNumber').textContent=`出店番号 ${shop.booth} ・ ${shop.region}`;
     document.querySelector('#shopPanelTitle').textContent=shop.name;
@@ -62,7 +74,7 @@
     }
     const source=element('p','shop-source','価格は公式サイト掲載時点の情報です。 ');
     const sourceLink=element('a','','公式の店舗ページを確認');sourceLink.href=shop.url;sourceLink.target='_blank';sourceLink.rel='noopener';source.append(sourceLink);shopPanelBody.append(source);
-    shopPanelBody.scrollTop=0;shopPanel.hidden=false;shopSelect.value=String(shop.booth);
+    shopPanelBody.scrollTop=0;shopPanel.hidden=false;selectedShop=shop;
     shopFocus.style.left=shop.map_position.x*100+'%';shopFocus.style.top=shop.map_position.y*100+'%';shopFocus.hidden=false;
     status.textContent=`出店番号 ${shop.booth}・${shop.name}`;
   }
@@ -70,7 +82,7 @@
     const rect=layer.querySelector('img').getBoundingClientRect();
     const x=(clientX-rect.left)/rect.width,y=(clientY-rect.top)/rect.height;
     let best=null,bestScore=Infinity;
-    for(const shop of shops){
+    for(const shop of filteredShops()){
       const dx=(x-shop.map_position.x)/.06,dy=(y-shop.map_position.y)/.022;
       const score=dx*dx+dy*dy;
       if(score<bestScore){best=shop;bestScore=score}
@@ -78,20 +90,24 @@
     return bestScore<=1.3?best:null;
   }
   priceModeButton.onclick=async()=>{
-    if(shopMode){shopMode=false;document.querySelector('.app').classList.remove('price-mode');priceModeButton.setAttribute('aria-pressed','false');shopSelector.hidden=true;shopHotspots.hidden=true;closeShop();map.setAttribute('aria-label','会場図。タップすると待ち合わせ位置のマーカーを移動できます');status.textContent='地図をタップして位置を指定';return}
+    if(shopMode){shopMode=false;document.querySelector('.app').classList.remove('price-mode');priceModeButton.setAttribute('aria-pressed','false');regionSelector.hidden=true;shopHotspots.hidden=true;regionSelect.value='';activeRegion='';closeShop();map.setAttribute('aria-label','会場図。タップすると待ち合わせ位置のマーカーを移動できます');status.textContent='地図をタップして位置を指定';return}
     priceModeButton.disabled=true;status.textContent='店舗データを読み込み中';
     try{
       shops=await catalogPromise;
-      if(!shopSelect.options.length||shopSelect.options.length===1){for(const shop of shops){const option=element('option','',`${shop.booth} ${shop.name}`);option.value=shop.booth;shopSelect.append(option)}}
-      if(!shopHotspots.childElementCount){for(const shop of shops){const button=element('button');button.type='button';button.style.left=shop.map_position.x*100+'%';button.style.top=shop.map_position.y*100+'%';button.setAttribute('aria-label',`出店番号 ${shop.booth} ${shop.name}`);button.onclick=()=>showShop(shop);shopHotspots.append(button)}}
-      shopMode=true;document.querySelector('.app').classList.add('price-mode');priceModeButton.setAttribute('aria-pressed','true');shopSelector.hidden=false;
+      if(regionSelect.options.length===1){
+        const order=['北海道','東北','関東','北陸・甲信越','東海','近畿','中国・四国','九州・沖縄','海外'];
+        const regions=[...new Set(shops.map(shop=>shop.region))].sort((a,b)=>order.indexOf(a)-order.indexOf(b));
+        for(const region of regions){const count=shops.filter(shop=>shop.region===region).length;const option=element('option','',`${region}（${count}店舗）`);option.value=region;regionSelect.append(option)}
+      }
+      if(!shopHotspots.childElementCount){for(const shop of shops){const button=element('button');button.type='button';button.style.left=shop.map_position.x*100+'%';button.style.top=shop.map_position.y*100+'%';button.dataset.region=shop.region;button.setAttribute('aria-label',`出店番号 ${shop.booth} ${shop.name}`);button.onclick=()=>showShop(shop);shopHotspots.append(button)}}
+      shopMode=true;document.querySelector('.app').classList.add('price-mode');priceModeButton.setAttribute('aria-pressed','true');regionSelector.hidden=false;
       shopHotspots.hidden=false;
-      map.setAttribute('aria-label','会場図。店舗をタップするとビールの値段を表示します');status.textContent='店舗をタップするとビールの値段を表示';
+      applyRegion();map.setAttribute('aria-label','会場図。店舗をタップするとビールの銘柄と価格を表示します');
     }catch(error){console.error(error);status.textContent='店舗データを読み込めませんでした';say('店舗データを読み込めませんでした')}
     finally{priceModeButton.disabled=false}
   };
-  shopSelect.onchange=()=>{const shop=shops.find(item=>String(item.booth)===shopSelect.value);if(shop)showShop(shop);else closeShop()};
-  document.querySelector('#closeShop').onclick=()=>{closeShop();status.textContent='店舗をタップするとビールの値段を表示'};
+  regionSelect.onchange=applyRegion;
+  document.querySelector('#closeShop').onclick=()=>{closeShop();status.textContent=regionStatus()};
   function applyView(){
     const maxX=map.clientWidth*(view.scale-1)/2,maxY=map.clientHeight*(view.scale-1)/2;
     view.tx=Math.max(-maxX,Math.min(maxX,view.tx));view.ty=Math.max(-maxY,Math.min(maxY,view.ty));

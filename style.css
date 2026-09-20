@@ -84,13 +84,14 @@ h1 {
 .header-actions button:active { background: #d6dbd2; }
 .header-actions button:disabled { opacity: .55; cursor: wait; }
 .header-actions button svg { display: block; width: 20px; height: 20px; }
-.header-actions .mode-button { width: 42px; font-size: 12px; }
+.header-actions .mode-button { display: flex; align-items: center; justify-content: center; gap: 3px; width: 69px; font-size: 12px; }
+.header-actions .mode-button svg { width: 19px; height: 19px; }
 .header-actions .mode-button[aria-pressed="true"] { background: var(--ink); color: white; }
 
-.shop-selector { display: flex; align-items: center; gap: 8px; margin: 0 0 9px; font-size: 12px; font-weight: 700; }
-.shop-selector[hidden] { display: none; }
-.shop-selector label { flex: none; }
-.shop-selector select { min-width: 0; width: 100%; padding: 7px; border: 1px solid var(--ink); border-radius: 0; background: white; color: var(--ink); font: inherit; }
+.region-selector { display: flex; align-items: center; gap: 8px; margin: 0 0 9px; font-size: 12px; font-weight: 700; }
+.region-selector[hidden] { display: none; }
+.region-selector label { flex: none; }
+.region-selector select { min-width: 0; width: 100%; padding: 7px; border: 1px solid var(--ink); border-radius: 0; background: white; color: var(--ink); font: inherit; }
 
 #shot {
   border-color: var(--accent);
@@ -162,6 +163,10 @@ h1 {
 .shop-hotspots { position: absolute; inset: 0; z-index: 6; pointer-events: none; }
 .shop-hotspots[hidden] { display: none; }
 .shop-hotspots button { position: absolute; width: 6%; height: 2.1%; padding: 0; transform: translate(-50%, -50%); border: 0; border-radius: 0; background: transparent; pointer-events: auto; cursor: pointer; }
+.shop-hotspots button[hidden] { display: none; }
+.shop-hotspots button.is-match::before { content: ''; position: absolute; left: 50%; top: 50%; width: 18px; height: 18px; border: 2px solid #247a50; background: #f5de7666; box-shadow: 0 0 0 2px white; transform: translate(-50%, -50%) scale(var(--inverse-zoom, 1)); animation: booth-pulse 1.25s ease-in-out infinite alternate; pointer-events: none; }
+@keyframes booth-pulse { from { opacity: .5; box-shadow: 0 0 0 1px white; } to { opacity: 1; box-shadow: 0 0 0 4px #247a5066; } }
+@media (prefers-reduced-motion: reduce) { .shop-hotspots button.is-match::before { animation: none; } }
 .shop-hotspots button:focus-visible { outline: 2px solid var(--accent); background: #fff8; }
 
 .bubble {
@@ -350,13 +355,14 @@ h1 {
   .app {
     display: grid;
     grid-template-columns: minmax(0, 1fr) minmax(160px, 230px);
-    grid-template-areas: "head head" "map side";
+    grid-template-areas: "head head" "filter filter" "map side";
     column-gap: 14px;
     width: min(100%, 800px);
     align-items: start;
   }
 
   .head { grid-area: head; }
+  .region-selector { grid-area: filter; }
   .map-card {
     grid-area: map;
     justify-self: end;
@@ -376,5 +382,5 @@ h1 {
   #clock { font-size: 18px; }
   .header-actions { gap: 3px; }
   .header-actions button { width: 30px; height: 30px; font-size: 17px; }
-  .header-actions .mode-button { width: 38px; font-size: 11px; }
+  .header-actions .mode-button { width: 65px; font-size: 11px; }
 }
