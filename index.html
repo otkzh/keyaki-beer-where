@@ -9,7 +9,7 @@
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' fill='%23c65b47'/%3E%3Cpath d='M23 13h20v34a8 8 0 0 1-8 8h-4a8 8 0 0 1-8-8z' fill='%23ffd84d'/%3E%3Cpath d='M43 21h5a8 8 0 0 1 0 16h-5' fill='none' stroke='white' stroke-width='5'/%3E%3Cpath d='M20 10h26' stroke='white' stroke-width='5' stroke-linecap='round'/%3E%3C/svg%3E">
   <meta property="og:title" content="けやきビール祭り｜いまここ">
   <meta property="og:description" content="会場図に待ち合わせ位置を表示し、画像を作れます。">
-  <link rel="stylesheet" href="style.css?v=8">
+  <link rel="stylesheet" href="style.css?v=9">
 </head>
 <body>
 <main class="app">
@@ -18,7 +18,6 @@
     <time id="clock">--:--</time>
     <div class="header-actions" aria-label="操作">
       <button id="priceMode" class="mode-button" aria-label="店舗・ビール価格モード" aria-pressed="false" title="店舗・ビール価格モード">価格</button>
-      <button id="markerButton" aria-label="マーカーとメッセージをランダムに変更" title="マーカーとメッセージをランダムに変更">📍</button>
       <button id="reset" aria-label="地図とマーカーをリセット" title="地図とマーカーをリセット">↺</button>
       <button id="shot" aria-label="共有用の画像を作る" title="共有用の画像を作る"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 15V3m0 0L8 7m4-4 4 4M5 13v7h14v-7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square" stroke-linejoin="miter"/></svg></button>
     </div>
@@ -27,12 +26,10 @@
   <section class="map-card" id="map" aria-label="会場図。タップすると待ち合わせ位置のマーカーを移動できます">
     <div class="map-layer" id="mapLayer">
       <img src="2026autumn-vector.svg" alt="2026けやきひろば秋のビール祭り会場図（添付PDFから変換したベクター版）">
-      <div class="pin" id="pin">
-        <svg class="pin-symbol" viewBox="0 0 48 60" aria-hidden="true"><path d="M24 58C20 50 3 34 3 23a21 21 0 0 1 42 0c0 11-17 27-21 35Z" fill="var(--accent)" stroke="white" stroke-width="3"/><circle cx="24" cy="23" r="7" fill="white"/></svg>
-        <svg class="mug-symbol" viewBox="0 0 48 60" aria-hidden="true" hidden><path d="M33 22h5a7 7 0 0 1 0 14h-5" fill="none" stroke="#a65a13" stroke-width="5"/><path d="M10 18h25l-2 31H13z" fill="#efa927" stroke="#7c4518" stroke-width="2.5"/><path d="M16 26v17m7-17v17" stroke="#ffe08a" stroke-width="3" stroke-linecap="round"/><path d="M10 19c-2-5 2-9 6-7 3-5 9-4 11 0 5-2 10 2 8 7 0 4-3 5-6 4-2 4-7 4-9 0-5 3-10 1-10-4Z" fill="#fff9e8" stroke="#d7b766" stroke-width="2"/></svg>
-        <svg class="bottle-symbol" viewBox="0 0 48 60" aria-hidden="true" hidden><path d="M20 9h8v12c0 3 5 6 5 11v20c0 3-2 5-5 5H20c-3 0-5-2-5-5V32c0-5 5-8 5-11Z" fill="#27845b" stroke="white" stroke-width="2.5"/><path d="M19 9h10v5H19z" fill="#e8a92c"/><path d="M15 34h18v15H15z" fill="#f5c54d"/><path d="M20 37h8v9h-8z" fill="#fff6d8"/><path d="M22 18h4" stroke="#c7e8af" stroke-width="2" stroke-linecap="round"/></svg>
-        <span class="emoji-symbol" aria-hidden="true" hidden></span>
-      </div>
+      <button class="pin is-drop" id="pin" type="button" aria-label="ドロップのマーカー。タップで十字に切り替え" title="タップでマーカーを切り替え">
+        <svg class="drop-symbol" viewBox="0 0 48 60" aria-hidden="true"><path d="M24 58C20 50 3 34 3 23a21 21 0 0 1 42 0c0 11-17 27-21 35Z" fill="var(--accent)" stroke="white" stroke-width="3"/><circle cx="24" cy="23" r="7" fill="white"/></svg>
+        <svg class="cross-symbol" viewBox="0 0 48 60" aria-hidden="true" hidden><path d="M19 5h10v16h14v10H29v24H19V31H5V21h14Z" fill="#356c4e" stroke="white" stroke-width="3"/></svg>
+      </button>
       <div class="bubble" id="bubble">ここにいます</div>
       <div class="shop-focus" id="shopFocus" hidden></div>
       <div class="shop-hotspots" id="shopHotspots" hidden></div>
@@ -60,6 +57,6 @@
   </div>
 </dialog>
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
-<script src="app.js?v=8" defer></script>
+<script src="app.js?v=9" defer></script>
 </body>
 </html>

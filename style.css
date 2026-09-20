@@ -129,43 +129,32 @@ h1 {
   z-index: 3;
   left: 50%;
   top: 50%;
-  width: 0;
-  height: 0;
-  transform: scale(var(--inverse-zoom, 1));
-  transform-origin: 0 0;
-  pointer-events: none;
+  display: block;
+  width: var(--marker-size, 42px);
+  height: calc(var(--marker-size, 42px) * 1.25);
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  transform: translate(-50%, -100%) scale(var(--inverse-zoom, 1));
+  transform-origin: 50% 100%;
+  cursor: pointer;
   transition: left .25s ease, top .25s ease;
 }
 
 .pin svg {
   position: absolute;
-  bottom: 0;
-  left: 0;
+  inset: 0;
   display: none;
-  width: var(--marker-size, 42px);
-  height: auto;
-  transform: translateX(-50%);
+  width: 100%;
+  height: 100%;
   overflow: visible;
   filter: drop-shadow(0 2px 1px #0004);
 }
 
 .pin svg[hidden] { display: none !important; }
-.pin.is-pin .pin-symbol,
-.pin.is-mug .mug-symbol,
-.pin.is-bottle .bottle-symbol { display: block; }
-
-.pin .emoji-symbol {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  transform: translateX(-50%);
-  font-size: var(--marker-size, 42px);
-  line-height: 1;
-  white-space: nowrap;
-  filter: drop-shadow(0 2px 1px #0004);
-}
-
-.pin .emoji-symbol[hidden] { display: none !important; }
+.pin.is-drop .drop-symbol, .pin.is-cross .cross-symbol { display: block; }
+.pin:focus-visible { outline: 2px solid var(--ink); outline-offset: 3px; }
 .app.price-mode .pin, .app.price-mode .bubble { visibility: hidden; }
 
 .shop-focus { position: absolute; z-index: 5; width: 25px; height: 25px; border: 3px solid var(--accent); background: #fff7; box-shadow: 0 0 0 2px white; transform: translate(-50%, -50%) scale(var(--inverse-zoom, 1)); pointer-events: none; }
