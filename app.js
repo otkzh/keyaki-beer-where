@@ -38,6 +38,75 @@
     status.textContent=`${markerNames[markerShape]}・${message}`;
   });
   applyMarker();
+  const priceModeButton=document.querySelector('#priceMode'),shopSelector=document.querySelector('#shopSelector'),shopSelect=document.querySelector('#shopSelect');
+  const shopPanel=document.querySelector('#shopPanel'),shopPanelBody=document.querySelector('#shopPanelBody'),shopFocus=document.querySelector('#shopFocus'),shopHotspots=document.querySelector('#shopHotspots');
+  let shopMode=false,shops=[];
+  const catalogPromise=fetch('data/beers.json?v=1').then(response=>{if(!response.ok)throw new Error('店舗データを読み込めません');return response.json()}).then(data=>data.shops);
+  function element(tag,className,text){const node=document.createElement(tag);if(className)node.className=className;if(text!==undefined)node.textContent=text;return node}
+  function closeShop(){shopPanel.hidden=true;shopFocus.hidden=true;shopSelect.value=''}
+  function showShop(shop){
+    document.querySelector('#shopNumber').textContent=`出店番号 ${shop.booth} ・ ${shop.region}`;
+    document.querySelector('#shopPanelTitle').textContent=shop.name;
+    shopPanelBody.replaceChildren();
+    if(shop.sets.length){
+      shopPanelBody.append(element('h3','',`飲み比べセット ${shop.sets.length}件`));
+      for(const set of shop.sets){
+        const item=element('div','shop-item');
+        item.append(element('div','shop-item-name',set.name));
+        item.append(element('div','shop-price-list',set.price_text||'価格未掲載'));
+        if(set.description)item.append(element('p','shop-item-description',set.description));
+        shopPanelBody.append(item);
+      }
+    }
+    shopPanelBody.append(element('h3','',`ビール ${shop.beers.length}件`));
+    for(const beer of shop.beers){
+      const item=element('div','shop-item'),name=element('div','shop-item-name');
+      const link=element('a','',beer.name);link.href=beer.url;link.target='_blank';link.rel='noopener';name.append(link);
+      for(const tag of beer.tags)name.append(element('span','shop-tag',tag));
+      item.append(name);
+      const prices=element('div','shop-price-list');
+      if(!beer.prices.length)prices.append(element('span','','価格未掲載'));
+      for(const price of beer.prices){
+        const entry=element('span');
+        const label=[price.size,price.volume_text].filter(Boolean).join(' / ');
+        if(label)entry.append(document.createTextNode(label+' '));
+        entry.append(element('strong','',price.price_text||'価格未掲載'));
+        prices.append(entry);
+      }
+      item.append(prices);shopPanelBody.append(item);
+    }
+    const source=element('p','shop-source','価格は公式サイト掲載時点の情報です。 ');
+    const sourceLink=element('a','','公式の店舗ページを確認');sourceLink.href=shop.url;sourceLink.target='_blank';sourceLink.rel='noopener';source.append(sourceLink);shopPanelBody.append(source);
+    shopPanelBody.scrollTop=0;shopPanel.hidden=false;shopSelect.value=String(shop.booth);
+    shopFocus.style.left=shop.map_position.x*100+'%';shopFocus.style.top=shop.map_position.y*100+'%';shopFocus.hidden=false;
+    status.textContent=`出店番号 ${shop.booth}・${shop.name}`;
+  }
+  function findShop(clientX,clientY){
+    const rect=layer.querySelector('img').getBoundingClientRect();
+    const x=(clientX-rect.left)/rect.width,y=(clientY-rect.top)/rect.height;
+    let best=null,bestScore=Infinity;
+    for(const shop of shops){
+      const dx=(x-shop.map_position.x)/.06,dy=(y-shop.map_position.y)/.022;
+      const score=dx*dx+dy*dy;
+      if(score<bestScore){best=shop;bestScore=score}
+    }
+    return bestScore<=1.3?best:null;
+  }
+  priceModeButton.onclick=async()=>{
+    if(shopMode){shopMode=false;document.querySelector('.app').classList.remove('price-mode');priceModeButton.setAttribute('aria-pressed','false');shopSelector.hidden=true;shopHotspots.hidden=true;closeShop();map.setAttribute('aria-label','会場図。タップすると待ち合わせ位置のマーカーを移動できます');status.textContent='地図をタップして位置を指定';return}
+    priceModeButton.disabled=true;status.textContent='店舗データを読み込み中';
+    try{
+      shops=await catalogPromise;
+      if(!shopSelect.options.length||shopSelect.options.length===1){for(const shop of shops){const option=element('option','',`${shop.booth} ${shop.name}`);option.value=shop.booth;shopSelect.append(option)}}
+      if(!shopHotspots.childElementCount){for(const shop of shops){const button=element('button');button.type='button';button.style.left=shop.map_position.x*100+'%';button.style.top=shop.map_position.y*100+'%';button.setAttribute('aria-label',`出店番号 ${shop.booth} ${shop.name}`);button.onclick=()=>showShop(shop);shopHotspots.append(button)}}
+      shopMode=true;document.querySelector('.app').classList.add('price-mode');priceModeButton.setAttribute('aria-pressed','true');shopSelector.hidden=false;
+      shopHotspots.hidden=false;
+      map.setAttribute('aria-label','会場図。店舗をタップするとビールの値段を表示します');status.textContent='店舗をタップするとビールの値段を表示';
+    }catch(error){console.error(error);status.textContent='店舗データを読み込めませんでした';say('店舗データを読み込めませんでした')}
+    finally{priceModeButton.disabled=false}
+  };
+  shopSelect.onchange=()=>{const shop=shops.find(item=>String(item.booth)===shopSelect.value);if(shop)showShop(shop);else closeShop()};
+  document.querySelector('#closeShop').onclick=()=>{closeShop();status.textContent='店舗をタップするとビールの値段を表示'};
   function applyView(){
     const maxX=map.clientWidth*(view.scale-1)/2,maxY=map.clientHeight*(view.scale-1)/2;
     view.tx=Math.max(-maxX,Math.min(maxX,view.tx));view.ty=Math.max(-maxY,Math.min(maxY,view.ty));
@@ -59,7 +128,10 @@
   });
   function endPointer(e){
     const p=pointers.get(e.pointerId);if(!p)return;const wasTap=pointers.size===1&&!gesture?.moved&&Math.hypot(p.x-p.sx,p.y-p.sy)<8;pointers.delete(e.pointerId);
-    if(wasTap){const r=layer.getBoundingClientRect();setPos((e.clientX-r.left)/r.width,(e.clientY-r.top)/r.height);status.textContent='位置を指定しました';navigator.vibrate?.(25)}
+    if(wasTap){
+      if(shopMode){const shop=findShop(e.clientX,e.clientY);if(shop){showShop(shop);navigator.vibrate?.(25)}else say('店舗番号の近くをタップしてください')}
+      else{const r=layer.getBoundingClientRect();setPos((e.clientX-r.left)/r.width,(e.clientY-r.top)/r.height);status.textContent='位置を指定しました';navigator.vibrate?.(25)}
+    }
     if(pointers.size===1){const left=[...pointers.values()][0];left.sx=left.x;left.sy=left.y;gesture={tx:view.tx,ty:view.ty,moved:true}}
   }
   map.addEventListener('pointerup',endPointer);map.addEventListener('pointercancel',endPointer);
